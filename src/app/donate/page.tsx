@@ -15,6 +15,10 @@ export default async function DonatePage() {
 
   const funds = (data as Fund[] | null) ?? [];
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <Container className="py-16">
       <div className="grid gap-12 lg:grid-cols-2 items-start">
@@ -26,7 +30,7 @@ export default async function DonatePage() {
           <div className="prose-body mt-6 text-ink/80">
             <p>
               Everything we do — worship, care for our neighbors, and mission
-              near and far — is carried by the generosity of Christpeople.
+              near and far — is carried by the generosity of God's people.
               Thank you for being part of it.
             </p>
             <p>
@@ -42,7 +46,7 @@ export default async function DonatePage() {
             appear here.
           </p>
         ) : (
-          <GivingForm funds={funds} />
+          <GivingForm funds={funds} defaultEmail={user?.email ?? ""} />
         )}
       </div>
     </Container>

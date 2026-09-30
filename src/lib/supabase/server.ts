@@ -31,7 +31,7 @@ export async function createClient() {
 }
 
 // Service-role client — bypasses RLS. Use ONLY in trusted server code
-// (e.g. the Stripe webhook). Never expose the service key to the browser.
+// (e.g. Paystack verification). Never expose the service key to the browser.
 export function createServiceClient() {
   return createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

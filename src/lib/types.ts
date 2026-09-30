@@ -74,8 +74,8 @@ export interface Donation {
   amount_cents: number;
   currency: string;
   status: DonationStatus;
-  stripe_session_id: string | null;
-  stripe_payment_intent: string | null;
+  provider_reference: string | null;
+  provider_transaction: string | null;
   donor_email: string | null;
   created_at: string;
 }

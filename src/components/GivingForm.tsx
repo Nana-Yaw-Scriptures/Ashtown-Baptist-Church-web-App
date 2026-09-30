@@ -7,16 +7,21 @@ import { cn } from "@/lib/utils";
 
 const PRESETS = [2000, 5000, 10000, 25000]; // in pesewas (₵20, ₵50, ₵100, ₵250)
 
-export function GivingForm({ funds }: { funds: Fund[] }) {
+export function GivingForm({
+  funds,
+  defaultEmail = "",
+}: {
+  funds: Fund[];
+  defaultEmail?: string;
+}) {
   const [amount, setAmount] = useState<number>(5000);
   const [custom, setCustom] = useState("");
   const [fundId, setFundId] = useState(funds[0]?.id ?? "");
+  const [email, setEmail] = useState(defaultEmail);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const effectiveAmount = custom
-    ? Math.round(parseFloat(custom) * 100)
-    : amount;
+  const effectiveAmount = custom ? Math.round(parseFloat(custom) * 100) : amount;
 
   async function handleDonate() {
     setError(null);
@@ -24,12 +29,16 @@ export function GivingForm({ funds }: { funds: Fund[] }) {
       setError("Please enter an amount of at least ₵1.");
       return;
     }
+    if (!email.trim()) {
+      setError("Please enter your email so we can send a receipt.");
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/stripe/checkout", {
+      const res = await fetch("/api/paystack/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount_cents: effectiveAmount, fund_id: fundId }),
+        body: JSON.stringify({ amount_cents: effectiveAmount, fund_id: fundId, email }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
@@ -76,6 +85,15 @@ export function GivingForm({ funds }: { funds: Fund[] }) {
         </div>
       </div>
 
+      <label className="block text-sm text-sage mt-5 mb-2">Your email (for a receipt)</label>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="you@example.com"
+        className="w-full rounded-lg border border-mist px-3 py-3 text-sm focus:border-dusk-500 outline-none"
+      />
+
       <label className="block text-sm text-sage mt-5 mb-2">Donate toward</label>
       <select
         value={fundId}
@@ -91,16 +109,11 @@ export function GivingForm({ funds }: { funds: Fund[] }) {
 
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
-      <Button
-        onClick={handleDonate}
-        disabled={loading}
-        variant="amber"
-        className="mt-6 w-full"
-      >
-        {loading ? "Redirecting to checkout..." : `Donate ₵${(effectiveAmount / 100).toFixed(2)}`}
+      <Button onClick={handleDonate} disabled={loading} variant="amber" className="mt-6 w-full">
+        {loading ? "Redirecting to Paystack..." : `Donate ₵${(effectiveAmount / 100).toFixed(2)}`}
       </Button>
       <p className="mt-3 text-xs text-ink/50 text-center">
-        Payments are processed securely by Stripe. You do not need an account to donate.
+        Payments are processed securely by Paystack — card or mobile money. You do not need an account to donate.
       </p>
     </div>
   );

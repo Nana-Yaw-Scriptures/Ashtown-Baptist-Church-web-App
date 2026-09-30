@@ -14,7 +14,7 @@ export function Footer() {
             </div>
             <p className="mt-3 text-sm text-white/70 max-w-sm leading-relaxed">
               A Christ community learning to build life on grace. We gather on Sundays
-              and share the Christ work of faith through the week.
+              and share the Christwork of faith through the week.
             </p>
           </div>
 
